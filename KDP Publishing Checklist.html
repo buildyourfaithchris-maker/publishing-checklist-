@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amazon KDP Book Publishing Checklist</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: EB Garamond & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        garamond: ['"EB Garamond"', 'serif'],
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        kdp: {
+                            50: '#fffbf0',
+                            100: '#fef3c7',
+                            500: '#f59e0b',
+                            600: '#d97706',
+                            700: '#b45309',
+                            900: '#78350f',
+                        },
+                        navy: {
+                            800: '#1e293b',
+                            900: '#0f172a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col">
+
+    <!-- Header Section -->
+    <header class="bg-navy-900 text-white border-b border-slate-700 sticky top-0 z-30 shadow-md">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div class="flex items-center space-x-3">
+                    <div class="bg-amber-500 p-2.5 rounded-lg text-slate-950 font-bold">
+                        <i class="fa-solid fa-book-open text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-white flex items-center gap-2">
+                            KDP Master Publishing Checklist
+                        </h1>
+                        <p class="text-xs text-slate-400">Garamond Layout • CMOS Citations • Dorean Licensing • Front Matter • KDP Specs</p>
+                    </div>
+                </div>
+
+                <!-- Book Project Title Input -->
+                <div class="flex items-center gap-2 bg-slate-800/80 p-2 rounded-lg border border-slate-700">
+                    <i class="fa-solid fa-bookmark text-amber-400 pl-2"></i>
+                    <input type="text" id="projectTitle" placeholder="Enter Book Title..." 
+                        class="bg-transparent text-sm text-white focus:outline-none w-48 sm:w-64 border-b border-transparent focus:border-amber-400 px-1 py-0.5 transition"
+                        value="My Masterpiece: Interior Layout & KDP Prep">
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full">
+
+        <!-- Progress Overview Card -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-8">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+                <div>
+                    <h2 class="text-lg font-semibold text-slate-900">Overall Publishing Readiness</h2>
+                    <p class="text-sm text-slate-500" id="progressStatusText">0 of 0 tasks completed (0%)</p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button onclick="resetAllProgress()" class="text-xs text-slate-500 hover:text-red-600 font-medium transition flex items-center gap-1.5 px-3 py-1.5 rounded-md hover:bg-slate-100">
+                        <i class="fa-solid fa-rotate-right"></i> Reset Progress
+                    </button>
+                    <button onclick="exportChecklistReport()" class="text-xs bg-slate-900 text-white hover:bg-slate-800 px-3.5 py-2 rounded-lg font-medium transition flex items-center gap-1.5 shadow-sm">
+                        <i class="fa-solid fa-file-export"></i> Export Report
+                    </button>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="w-full bg-slate-100 rounded-full h-3.5 overflow-hidden p-0.5 border border-slate-200">
+                <div id="progressBar" class="bg-gradient-to-r from-amber-500 to-amber-600 h-full rounded-full transition-all duration-500 ease-out" style="width: 0%"></div>
+            </div>
+
+            <!-- Mini Category Indicators -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 mt-6 pt-4 border-t border-slate-100 text-center" id="categoryStats">
+                <!-- Injected via JS -->
+            </div>
+        </div>
+
+        <!-- Filter & Search Controls -->
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 mb-6">
+            <div class="flex items-center gap-2 overflow-x-auto pb-2 sm:pb-0 scrollbar-none" id="filterTabs">
+                <button onclick="setFilter('all')" data-filter="all" class="filter-btn px-3.5 py-1.5 text-xs font-medium rounded-full bg-slate-900 text-white transition shadow-sm">
+                    All Items
+                </button>
+                <button onclick="setFilter('garamond')" data-filter="garamond" class="filter-btn px-3.5 py-1.5 text-xs font-medium rounded-full bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 transition">
+                    Garamond Layout
+                </button>
+                <button onclick="setFilter('cmos')" data-filter="cmos" class="filter-btn px-3.5 py-1.5 text-xs font-medium rounded-full bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 transition">
+                    Chicago Style
+                </button>
+                <button onclick="setFilter('frontmatter')" data-filter="frontmatter" class="filter-btn px-3.5 py-1.5 text-xs font-medium rounded-full bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 transition">
+                    Front Matter
+                </button>
+                <button onclick="setFilter('titlepage')" data-filter="titlepage" class="filter-btn px-3.5 py-1.5 text-xs font-medium rounded-full bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 transition">
+                    Title Page
+                </button>
+                <button onclick="setFilter('kdp')" data-filter="kdp" class="filter-btn px-3.5 py-1.5 text-xs font-medium rounded-full bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 transition">
+                    KDP Specs
+                </button>
+                <button onclick="setFilter('proof')" data-filter="proof" class="filter-btn px-3.5 py-1.5 text-xs font-medium rounded-full bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 transition">
+                    Proof Approval
+                </button>
+            </div>
+
+            <div class="relative min-w-[200px]">
+                <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                <input type="text" id="searchInput" oninput="handleSearch()" placeholder="Search requirements..." 
+                    class="w-full bg-white text-xs text-slate-700 pl-9 pr-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500/50 shadow-sm">
+            </div>
+        </div>
+
+        <!-- Checklist Accordion Container -->
+        <div id="checklistSections" class="space-y-6">
+            <!-- Sections will be dynamically rendered here -->
+        </div>
+
+    </main>
+
+    <!-- Modal for Export Report -->
+    <div id="exportModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-xl max-w-2xl w-full overflow-hidden border border-slate-200 flex flex-col max-h-[90vh]">
+            <div class="bg-slate-900 text-white px-6 py-4 flex items-center justify-between">
+                <h3 class="font-semibold text-lg flex items-center gap-2">
+                    <i class="fa-solid fa-file-lines text-amber-400"></i> Publishing Readiness Report
+                </h3>
+                <button onclick="closeExportModal()" class="text-slate-400 hover:text-white transition">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <div class="p-6 overflow-y-auto flex-1 custom-scrollbar">
+                <p class="text-xs text-slate-500 mb-4">Copy your publishing compliance summary for record-keeping or share with your interior designer/editor.</p>
+                <textarea id="exportTextarea" class="w-full h-80 font-mono text-xs p-4 bg-slate-950 text-slate-200 rounded-lg border border-slate-800 focus:outline-none" readonly></textarea>
+            </div>
+            <div class="bg-slate-50 border-t border-slate-200 px-6 py-3 flex justify-end gap-3">
+                <button onclick="copyExportText()" class="px-4 py-2 bg-amber-500 text-slate-950 font-semibold rounded-lg text-xs hover:bg-amber-400 transition flex items-center gap-2">
+                    <i class="fa-solid fa-copy"></i> Copy to Clipboard
+                </button>
+                <button onclick="closeExportModal()" class="px-4 py-2 bg-slate-200 text-slate-700 font-medium rounded-lg text-xs hover:bg-slate-300 transition">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-6 text-center text-xs text-slate-500 mt-auto">
+        <div class="max-w-6xl mx-auto px-4">
+            <p>Amazon KDP Formatting & Verification Suite • Optimized for 6" x 9", 5.5" x 8.5", and Standard Trade Paperback Specifications</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript Data and Logic -->
+    <script>
+        const checklistData = [
+            {
+                id: "garamond",
+                title: "1. Garamond Font & Interior Typography Verification",
+                icon: "fa-font",
+                description: "Verify proper Garamond sizing, leading, gutter margins, and font embedding settings.",
+                items: [
+                    {
+                        id: "garamond_1",
+                        title: "Font Selection & Font Variant Verification",
+                        summary: "Use true professional Garamond fonts (Adobe Garamond Pro, EB Garamond, or Monotype Garamond). Avoid screen fonts like Arial or System Times New Roman for body text.",
+                        details: "<strong>Standard:</strong> Ensure your layout program (InDesign, Affinity Publisher, Word) uses a high-grade print variant (e.g., Adobe Garamond Pro or EB Garamond). Verify that Regular, Italic, Bold, and Bold Italic font files are explicitly installed and embedded as PostScript/TrueType vectors.",
+                        tip: "KDP requires all fonts to be 100% embedded in the final PDF export."
+                    },
+                    {
+                        id: "garamond_2",
+                        title: "Font Size & Leading (Line Spacing) Hierarchy",
+                        summary: "Set body text to 11pt / 14pt leading, with proportional leading for Chapter Titles (20-24pt) and Subtitles (14-16pt).",
+                        details: "<strong>Garamond Typographic Hierarchy Ratios:</strong><br>• <strong>Chapter Titles:</strong> 20pt – 24pt Garamond (Bold/Regular) with 26pt – 30pt leading.<br>• <strong>Subtitles & Headings:</strong> 14pt – 16pt Garamond (Italic/Semibold) with 18pt – 20pt leading.<br>• <strong>Body Text:</strong> 11pt size with 14pt leading (1.25x – 1.3x font size).<br>• <strong>Footnotes:</strong> 9pt – 9.5pt with 11.5pt leading.<br>Avoid 'Auto' leading in layout software as it can cause inconsistent line distribution across facing pages.",
+                        tip: "Ensure line height remains uniform across facing body pages to maintain horizontal baseline grid alignment."
+                    },
+                    {
+                        id: "garamond_3",
+                        title: "Gutter Margin & Inside/Outside Calculation",
+                        summary: "Set inside gutter margin based on total page count to prevent text swallowing in the binding.",
+                        details: "<strong>KDP Gutter Guidelines:</strong><br>• 24 to 150 pages: Minimum Inside Margin = 0.375 in (9.5 mm)<br>• 151 to 300 pages: Minimum Inside Margin = 0.50 in (12.7 mm)<br>• 301 to 500 pages: Minimum Inside Margin = 0.625 in (15.9 mm)<br>• 501+ pages: Minimum Inside Margin = 0.75 in (19.1 mm)<br>• Outside / Top / Bottom Margins: Minimum 0.5 in (12.7 mm) without bleed.",
+                        tip: "Always add 0.125\" - 0.25\" extra safety margin beyond KDP minimums for comfortable readability."
+                    },
+                    {
+                        id: "garamond_4",
+                        title: "Mirror Margins & Recto/Verso Layout Setup",
+                        summary: "Enable Facing Pages / Mirror Margins so inner margins automatically mirror on left and right pages.",
+                        details: "Verso (Left) pages hold even numbers; Recto (Right) pages hold odd numbers. Verify that the wider gutter margin is on the right for left-hand pages, and on the left for right-hand pages.",
+                        tip: "Running headers should also mirror (e.g., Book Title on Verso, Chapter Title on Recto)."
+                    },
+                    {
+                        id: "garamond_5",
+                        title: "Orphan & Widow Control",
+                        summary: "Prevent single lines of text from isolating at the top or bottom of pages.",
+                        details: "Set paragraph rules to require at least 2 lines at the start (Widow) and end (Orphan) of any paragraph. Do not allow single heading lines at the bottom of a page without at least 2-3 lines of body text below it.",
+                        tip: "Adjust tracking by ±1 or ±2 units to pull back or push down troublesome single lines."
+                    },
+                    {
+                        id: "garamond_6",
+                        title: "Font Embedding Verification in PDF",
+                        summary: "Confirm all Garamond font subsets are embedded in the PDF document properties.",
+                        details: "Open exported PDF in Adobe Acrobat → File → Properties → Fonts. Verify every font listed displays <em>(Embedded Subset)</em>. If any font shows system fallback or missing status, KDP print processing will fail or alter your typography.",
+                        tip: "Convert text to outlines ONLY if embedding fails repeatedly, though native vector embedding is preferred."
+                    }
+                ]
+            },
+            {
+                id: "cmos",
+                title: "2. Chicago Manual of Style (CMOS) Citation & Editorial Checks",
+                icon: "fa-book-bookmark",
+                description: "Ensure compliance with CMOS 17th/18th Edition rules for notes, bibliographies, and formatting.",
+                items: [
+                    {
+                        id: "cmos_1",
+                        title: "Citation Consistency (Notes & Bibliography vs. Author-Date)",
+                        summary: "Maintain a single uniform citation style throughout the entire manuscript.",
+                        details: "<strong>Humanities Style:</strong> Uses numbered Footnotes/Endnotes + Bibliography.<br><strong>Sciences/Social Sciences:</strong> Uses In-text Parenthetical (Author Year, Page) + Reference List.<br>Do not mix the two systems within the same work.",
+                        tip: "Verify all footnote numbers in text correspond exactly to matching note entries."
+                    },
+                    {
+                        id: "cmos_2",
+                        title: "Footnote & Endnote Formatting",
+                        summary: "Format footnotes in 9pt-10pt Garamond, single-spaced with a 0.5\" first-line indent.",
+                        details: "• Footnote numbers in main text should be superscripted without brackets or periods.<br>• Footnotes at page bottom should start with a superscript number or regular number followed by a period (consistent throughout).<br>• Use short-form notes (Author, <em>Short Title</em>, page) for subsequent citations of the same source.",
+                        tip: "Separate body text from footnotes with a clean 1.5-inch separator rule."
+                    },
+                    {
+                        id: "cmos_3",
+                        title: "Block Quotation Formatting",
+                        summary: "Indent prose quotes of 100+ words (or 5+ lines) by 0.5 inches from the left margin.",
+                        details: "• Block quotes do NOT use opening or closing quotation marks.<br>• Set block quotes in single-spacing or 1.1x line spacing.<br>• Extra space (6pt) above and below the block quote.<br>• Set font size to 10pt (1pt smaller than body text).",
+                        tip: "Citations for block quotes appear after the final punctuation mark."
+                    },
+                    {
+                        id: "cmos_4",
+                        title: "Punctuation Inside Quotation Marks",
+                        summary: "Adhere to the American CMOS rule: commas and periods placed inside quotation marks.",
+                        details: "• Correct: \"This is correct text,\" said the editor.<br>• Incorrect: \"This is incorrect text\", said the editor.<br>• Colons and semicolons remain outside quotation marks unless part of the original quote.",
+                        tip: "Ensure double quotation marks are used for main quotes and single quotes for quotes within quotes."
+                    },
+                    {
+                        id: "cmos_5",
+                        title: "Numbers & Numerals Conventions",
+                        summary: "Spell out whole numbers zero through one hundred in general prose.",
+                        details: "• Spell out: zero through one hundred (e.g., \"forty-two chapters\", \"nineteen pages\").<br>• Use figures: 101 and above (e.g., \"125 participants\").<br>• Exception: Always use figures for percentages, physical measurements, dates, and page references (e.g., 5 percent, 6 inches, page 4).",
+                        tip: "Never start a sentence with a numeral; spell the number out or rephrase the sentence."
+                    },
+                    {
+                        id: "cmos_6",
+                        title: "Oxford / Serial Comma Uniformity",
+                        summary: "Apply the serial (Oxford) comma consistently before 'and' or 'or' in series of three+ items.",
+                        details: "Example: \"red, white, and blue\" (CMOS required standard). Verify across all chapters that serial commas are not randomly omitted.",
+                        tip: "Run a global document search for ', and' and ', or' to check consistency."
+                    }
+                ]
+            },
+            {
+                id: "frontmatter",
+                title: "3. Front Matter Sequence & Licensing Setup",
+                icon: "fa-list-ol",
+                description: "Organize mandatory preliminary pages in formal order with Roman numeral pagination and proper licensing.",
+                items: [
+                    {
+                        id: "fm_1",
+                        title: "Standard Front Matter Order Verification",
+                        summary: "Sequence front matter according to industry publishing standards.",
+                        details: "<strong>Standard Canonical Sequence:</strong><br>1. Half Title Page (Page i - right hand)<br>2. Frontispiece or Blank (Page ii - left hand)<br>3. Full Title Page (Page iii - right hand)<br>4. Copyright / Public Domain License Page (Page iv - left hand)<br>5. Dedication / Epigraph (Page v - right hand)<br>6. Table of Contents (Page vii - right hand)<br>7. Foreword / Preface / Acknowledgments<br>8. Introduction",
+                        tip: "Major front matter elements and Chapter 1 must always begin on a Recto (right-hand) page."
+                    },
+                    {
+                        id: "fm_2",
+                        title: "Pagination Rules (Roman vs. Arabic Numerals)",
+                        summary: "Front matter uses lower-case Roman numerals (i, ii, iii); Chapter 1 starts on Arabic Page 1.",
+                        details: "• Front matter page numbers are centered at the footer or suppressed.<br>• Page numbers must NOT appear on Half Title, Full Title, Copyright, or Dedication pages (even though they count in the sequence).<br>• Chapter 1 (Body start) resets to Arabic number '1' on a right-hand page.",
+                        tip: "In Word/InDesign, insert a Section Break (Next Page or Odd Page) before Chapter 1 to unlink headers/footers."
+                    },
+                    {
+                        id: "fm_3",
+                        title: "Copyright & Dorean Licensing Verification",
+                        summary: "Confirm licensing statement aligns with either standard copyright or Dorean Principle (CC0 / Public Domain dedication).",
+                        details: "<strong>Dorean Principle Notice (Recommended for freely-given ministry):</strong><br><em>'To the extent possible under law, the author has waived all copyright and related or neighboring rights to this work under Creative Commons CC0.'</em><br><br><strong>Standard Commercial Copyright Notice:</strong><br><em>'Copyright © [Year] by [Author Name]. All rights reserved.'</em><br><br><strong>Required Metadata Elements (Both Styles):</strong><br>• Book Title & Subtitle<br>• ISBN-13 (Paperback and Hardcover specified separately)<br>• Publisher / Imprint Line (or 'Independently Published')<br>• Print Edition Line (e.g., First Edition, 2026)<br>• Printed in [Country]",
+                        tip: "The Dorean Principle advocates giving gospel/ministry content without commercial paywalls or legal obligations, using CC0 public domain dedications."
+                    },
+                    {
+                        id: "fm_4",
+                        title: "Table of Contents Page Number Match",
+                        summary: "Verify TOC headings, subheadings, and page numbers exactly match main body text.",
+                        details: "Ensure chapter titles in TOC match text formatting verbatim. Verify leader dots (if used) are aligned to the right-justified page numbers.",
+                        tip: "Re-generate dynamic TOC in layout software immediately before exporting final PDF."
+                    }
+                ]
+            },
+            {
+                id: "titlepage",
+                title: "4. Title Page Formatting & Typographic Balance",
+                icon: "fa-heading",
+                description: "Format the interior main title page for optical balance, alignment, and clean aesthetic.",
+                items: [
+                    {
+                        id: "tp_1",
+                        title: "Visual Hierarchy & Font Pairing",
+                        summary: "Title set in prominent Garamond weight, Subtitle in smaller contrasting weight/style.",
+                        details: "• Title: Garamond Bold / Semi-bold (24pt - 36pt)<br>• Subtitle: Garamond Regular / Italic (14pt - 18pt)<br>• Author Name: Garamond Regular or Small Caps (12pt - 14pt)<br>Maintain 1.5x - 2x vertical spacing between elements.",
+                        tip: "Ensure title font matches cover design typography style for visual coherence."
+                    },
+                    {
+                        id: "tp_2",
+                        title: "Publisher Imprint & Logo Placement",
+                        summary: "Position publisher logo and city line at the bottom center of the title page.",
+                        details: "Place imprint name or logo approximately 1 inch above the bottom margin. Keep dimensions compact (under 0.75\" height for logos).",
+                        tip: "If publishing under an imprint like Dorean Press, ensure crisp 300 DPI vector artwork."
+                    },
+                    {
+                        id: "tp_3",
+                        title: "Page Number & Header Suppression",
+                        summary: "Confirm zero headers, footers, or page numbers are printed on the Title Page.",
+                        details: "The Title Page is technically page 'iii', but the number itself must be invisible/suppressed on the printed layout.",
+                        tip: "Check 'Different First Page' or unlink header/footer settings in section layout options."
+                    },
+                    {
+                        id: "tp_4",
+                        title: "Optical Center Alignment",
+                        summary: "Center title page text horizontally relative to margins, accounting for gutter shift.",
+                        details: "Because inside gutter margins are wider than outside margins, text that is mathematically centered on the paper page will look off-center. Center text strictly between the effective print margins.",
+                        tip: "Use margin-based alignment rather than page-based centering."
+                    }
+                ]
+            },
+            {
+                id: "kdp",
+                title: "5. KDP Cover & Interior File Upload Preparation",
+                icon: "fa-cloud-arrow-up",
+                description: "Ensure PDF export settings comply with Amazon KDP print engine standards.",
+                items: [
+                    {
+                        id: "kdp_1",
+                        title: "PDF/X Export Compliance (PDF/X-1a:2001 or PDF/X-4)",
+                        summary: "Export interior as PDF/X to flatten transparency and embed all fonts.",
+                        details: "Standard PDF exports may leave transparency layers or font subsets unflattened, causing missing characters or dark box artifacts when printed. Use PDF/X-1a:2001 or PDF/X-4 print standards.",
+                        tip: "Ensure image resolution is 300 DPI minimum for all embedded images/illustrations."
+                    },
+                    {
+                        id: "kdp_2",
+                        title: "Trim Size Verification",
+                        summary: "Confirm PDF page dimensions match KDP dashboard selection exactly.",
+                        details: "Common trade sizes:<br>• 6\" x 9\" (15.24 x 22.86 cm)<br>• 5.5\" x 8.5\" (13.97 x 21.59 cm)<br>• 5\" x 8\" (12.7 x 20.32 cm)<br>Verify in Adobe Acrobat: File → Properties → Page Size. PDF width/height must match chosen KDP size.",
+                        tip: "If document has NO bleed, exported PDF dimensions must equal trim size exactly."
+                    },
+                    {
+                        id: "kdp_3",
+                        title: "Bleed vs. No Bleed Interior Setup",
+                        summary: "If images extend to page edge, add 0.125\" (3.2 mm) bleed to top, bottom, and outer edge.",
+                        details: "• <strong>No Bleed:</strong> Page size = 6\" x 9\"<br>• <strong>Bleed (Images touch edge):</strong> PDF size must be 6.125\" x 9.25\" (Width + 0.125\", Height + 0.25\").<br>Do not add bleed to the inside binding edge.",
+                        tip: "Select 'PDF with Bleed' in KDP upload dashboard only if bleed is added."
+                    },
+                    {
+                        id: "kdp_4",
+                        title: "Full Cover PDF Spine Calculation & Template Alignment",
+                        summary: "Export cover as a single spread (Back + Spine + Front) with 0.125\" bleed on all outer sides.",
+                        details: "Spine width formula for KDP White Paper: Page Count × 0.002252 in.<br>Spine width formula for KDP Cream Paper: Page Count × 0.0025 in.<br><br><strong>Imprint Logo Placement Rules:</strong><br>• <strong>Spine Base:</strong> Place logo icon UPRIGHT at bottom of spine (does NOT rotate with 90° title text).<br>• <strong>Back Cover:</strong> Bottom left or bottom center (keep clear of lower-right barcode zone).<br>• <strong>Front Cover:</strong> Optional; usually omitted on trade paperbacks.",
+                        tip: "Keep all cover text and critical art at least 0.125\" inside the trim line safety zone."
+                    },
+                    {
+                        id: "kdp_5",
+                        title: "Barcode Clear Zone Verification",
+                        summary: "Leave a 2\" wide by 1.2\" high blank light-colored space on lower right back cover.",
+                        details: "KDP prints their automated barcode in a 2.0\" × 1.2\" rectangle on the lower right of the back cover. Ensure no key text, price details, or author photos are located in this reserved area.",
+                        tip: "If providing your own barcode image, ensure it is 300 DPI vector/raster image with clear white background."
+                    }
+                ]
+            },
+            {
+                id: "proof",
+                title: "6. Proof Copy Inspection & Final Approval",
+                icon: "fa-circle-check",
+                description: "Perform digital and physical checks before publishing live on Amazon.",
+                items: [
+                    {
+                        id: "proof_1",
+                        title: "KDP Online Previewer Automated Check",
+                        summary: "Review full interior and cover in KDP Print Previewer for red flag error margins.",
+                        details: "Look for automated red dashed warning boxes. Inspect:<br>• Text outside printable bounds.<br>• Unembedded fonts.<br>• Low-resolution images (<200 DPI).<br>• Spine text overflowing onto front/back cover.",
+                        tip: "Click through every single page in the previewer prior to approving."
+                    },
+                    {
+                        id: "proof_2",
+                        title: "Order Physical Printed Proof Copy",
+                        summary: "Always order a physical proof copy before publishing for public sale.",
+                        details: "Digital screens hide layout flaws, poor contrast, tight gutters, and small font sizing issues. Click 'Order Proof Copies' in KDP dashboard.",
+                        tip: "Never skip the physical proof step—digital previewers do not reveal physical binding tightness."
+                    },
+                    {
+                        id: "proof_3",
+                        title: "Physical Proof Layout & Margin Inspection",
+                        summary: "Test read the physical book: verify binding gutter clearance and eye tracking comfort.",
+                        details: "Open the book flat to middle pages. Verify:<br>• Text does not dive into spine fold (gutter check).<br>• Outer thumb margins allow comfortable holding without covering text.<br>• Headers and footers are consistently spaced from body text.",
+                        tip: "Use a physical ruler to measure actual printed margins against your digital design specs."
+                    },
+                    {
+                        id: "proof_4",
+                        title: "Garamond Legibility & Ink Density Check",
+                        summary: "Inspect Garamond print weight, stroke width, and footnote legibility under physical lighting.",
+                        details: "Verify that Garamond serifs are crisp, 11pt text is comfortable for long reading, and footnote text (9pt) is clear without ink bleeding or fading.",
+                        tip: "Examine italic passages to ensure character strokes don't break up in print."
+                    },
+                    {
+                        id: "proof_5",
+                        title: "Spine & Cover Art Alignment Inspection",
+                        summary: "Verify spine text centering, cover fold accuracy, and lamination quality.",
+                        details: "Check that spine text is perfectly centered across the spine fold lines and does not spill onto front or back cover panels. Verify cover title color contrast and matte/gloss finish quality.",
+                        tip: "Allow ±0.0625\" (1.6 mm) manufacturing variance tolerance in physical copies."
+                    },
+                    {
+                        id: "proof_6",
+                        title: "Pricing Strategy & Final Launch Sign-off",
+                        summary: "Confirm pricing structure (At-Cost for Dorean titles or Standard Royalty) and release.",
+                        details: "Verify list price, territory distribution rights, and author metadata.<br>• <strong>Dorean Principle Pricing:</strong> Set retail price to KDP's absolute minimum printing cost ($0 author royalty) to offer ministry without commercial profit.<br>• <strong>Standard Pricing:</strong> Select 60% royalty rate and desired retail margin.",
+                        tip: "Ensure digital Kindle version is either free/priced at minimum allowable threshold with CC0 release."
+                    }
+                ]
+            }
+        ];
+
+        // App State Management
+        let appState = {
+            completedItems: {},
+            itemNotes: {},
+            currentFilter: 'all',
+            searchQuery: '',
+            projectTitle: 'My Masterpiece: Interior Layout & KDP Prep'
+        };
+
+        // Initialize App
+        document.addEventListener('DOMContentLoaded', () => {
+            loadState();
+            setupEventListeners();
+            renderChecklist();
+            updateProgress();
+        });
+
+        function loadState() {
+            const saved = localStorage.getItem('kdp_checklist_state');
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    appState = { ...appState, ...parsed };
+                } catch (e) {
+                    console.error("Failed to parse saved state", e);
+                }
+            }
+            
+            const titleInput = document.getElementById('projectTitle');
+            if (titleInput && appState.projectTitle) {
+                titleInput.value = appState.projectTitle;
+            }
+        }
+
+        function saveState() {
+            localStorage.setItem('kdp_checklist_state', JSON.stringify(appState));
+        }
+
+        function setupEventListeners() {
+            document.getElementById('projectTitle').addEventListener('input', (e) => {
+                appState.projectTitle = e.target.value;
+                saveState();
+            });
+        }
+
+        function setFilter(filter) {
+            appState.currentFilter = filter;
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                if (btn.getAttribute('data-filter') === filter) {
+                    btn.className = 'filter-btn px-3.5 py-1.5 text-xs font-medium rounded-full bg-slate-900 text-white transition shadow-sm';
+                } else {
+                    btn.className = 'filter-btn px-3.5 py-1.5 text-xs font-medium rounded-full bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 transition';
+                }
+            });
+            renderChecklist();
+        }
+
+        function handleSearch() {
+            appState.searchQuery = document.getElementById('searchInput').value.toLowerCase().trim();
+            renderChecklist();
+        }
+
+        function toggleItem(id) {
+            appState.completedItems[id] = !appState.completedItems[id];
+            saveState();
+            updateProgress();
+            
+            // Toggle visual state of checkbox card
+            const card = document.getElementById(`card-${id}`);
+            const checkIcon = document.getElementById(`check-${id}`);
+            if (card && checkIcon) {
+                if (appState.completedItems[id]) {
+                    card.classList.add('border-emerald-300', 'bg-emerald-50/20');
+                    checkIcon.className = 'fa-solid fa-square-check text-xl text-emerald-600 transition';
+                } else {
+                    card.classList.remove('border-emerald-300', 'bg-emerald-50/20');
+                    checkIcon.className = 'fa-regular fa-square text-xl text-slate-400 hover:text-amber-500 transition';
+                }
+            }
+            renderCategoryStats();
+        }
+
+        function updateNote(id, noteText) {
+            appState.itemNotes[id] = noteText;
+            saveState();
+        }
+
+        function toggleDrawer(id) {
+            const drawer = document.getElementById(`drawer-${id}`);
+            const icon = document.getElementById(`chevron-${id}`);
+            if (drawer && icon) {
+                if (drawer.classList.contains('hidden')) {
+                    drawer.classList.remove('hidden');
+                    icon.classList.add('rotate-180');
+                } else {
+                    drawer.classList.add('hidden');
+                    icon.classList.remove('rotate-180');
+                }
+            }
+        }
+
+        function renderChecklist() {
+            const container = document.getElementById('checklistSections');
+            container.innerHTML = '';
+
+            checklistData.forEach(section => {
+                // Filter sections based on tab selection
+                if (appState.currentFilter !== 'all' && section.id !== appState.currentFilter) {
+                    return;
+                }
+
+                // Filter items by search query
+                const filteredItems = section.items.filter(item => {
+                    if (!appState.searchQuery) return true;
+                    return item.title.toLowerCase().includes(appState.searchQuery) ||
+                           item.summary.toLowerCase().includes(appState.searchQuery) ||
+                           item.details.toLowerCase().includes(appState.searchQuery);
+                });
+
+                if (filteredItems.length === 0) return;
+
+                const sectionEl = document.createElement('div');
+                sectionEl.className = 'bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden';
+
+                const completedCount = filteredItems.filter(i => appState.completedItems[i.id]).length;
+                const percent = Math.round((completedCount / filteredItems.length) * 100);
+
+                let itemsHtml = filteredItems.map(item => {
+                    const isChecked = !!appState.completedItems[item.id];
+                    const noteValue = appState.itemNotes[item.id] || '';
+
+                    return `
+                        <div id="card-${item.id}" class="p-4 sm:p-5 border-b border-slate-100 last:border-b-0 hover:bg-slate-50/60 transition ${isChecked ? 'border-emerald-300 bg-emerald-50/20' : ''}">
+                            <div class="flex items-start gap-3.5">
+                                <button onclick="toggleItem('${item.id}')" class="mt-0.5 focus:outline-none flex-shrink-0" aria-label="Toggle completed state">
+                                    <i id="check-${item.id}" class="${isChecked ? 'fa-solid fa-square-check text-xl text-emerald-600' : 'fa-regular fa-square text-xl text-slate-400 hover:text-amber-500'} transition"></i>
+                                </button>
+                                
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-center justify-between gap-2 cursor-pointer" onclick="toggleDrawer('${item.id}')">
+                                        <h4 class="text-sm font-semibold text-slate-900 hover:text-amber-600 transition ${isChecked ? 'line-through text-slate-500' : ''}">
+                                            ${item.title}
+                                        </h4>
+                                        <button class="text-slate-400 hover:text-slate-600 p-1 transition" aria-label="Expand details">
+                                            <i id="chevron-${item.id}" class="fa-solid fa-chevron-down text-xs transition-transform duration-200"></i>
+                                        </button>
+                                    </div>
+                                    <p class="text-xs text-slate-600 mt-1 leading-relaxed">
+                                        ${item.summary}
+                                    </p>
+
+                                    <!-- Collapsible Drawer with Specs and Notes -->
+                                    <div id="drawer-${item.id}" class="hidden mt-4 pt-3 border-t border-slate-200/60 space-y-3">
+                                        <div class="bg-amber-50/50 rounded-lg p-3 text-xs text-slate-700 border border-amber-200/60 space-y-2">
+                                            <div class="font-medium text-amber-900 flex items-center gap-1.5">
+                                                <i class="fa-solid fa-circle-info text-amber-600"></i> Requirements & Formatting Details:
+                                            </div>
+                                            <div class="text-slate-700 leading-relaxed">
+                                                ${item.details}
+                                            </div>
+                                            ${item.tip ? `
+                                                <div class="mt-2 pt-2 border-t border-amber-200/40 text-amber-800 italic flex items-start gap-1.5">
+                                                    <i class="fa-solid fa-lightbulb text-amber-500 mt-0.5"></i>
+                                                    <span><strong>Pro Tip:</strong> ${item.tip}</span>
+                                                </div>
+                                            ` : ''}
+                                        </div>
+
+                                        <!-- Custom User Notes Input -->
+                                        <div class="flex items-center gap-2 pt-1">
+                                            <i class="fa-solid fa-pencil text-slate-400 text-xs"></i>
+                                            <input type="text" 
+                                                value="${escapeHtml(noteValue)}"
+                                                placeholder="Add custom verification note (e.g., Margins set to 0.625 in InDesign)..." 
+                                                onchange="updateNote('${item.id}', this.value)"
+                                                class="w-full text-xs bg-slate-50 border border-slate-200 rounded px-2.5 py-1.5 text-slate-700 focus:bg-white focus:outline-none focus:ring-1 focus:ring-amber-500">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                sectionEl.innerHTML = `
+                    <div class="bg-slate-900 text-white px-5 py-4 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid ${section.icon} text-amber-400 text-base"></i>
+                            <div>
+                                <h3 class="font-bold text-sm sm:text-base">${section.title}</h3>
+                                <p class="text-xs text-slate-400 font-normal hidden sm:block">${section.description}</p>
+                            </div>
+                        </div>
+                        <span class="text-xs font-semibold px-2.5 py-1 bg-slate-800 text-amber-400 rounded-full border border-slate-700">
+                            ${completedCount}/${filteredItems.length} (${percent}%)
+                        </span>
+                    </div>
+                    <div>
+                        ${itemsHtml}
+                    </div>
+                `;
+
+                container.appendChild(sectionEl);
+            });
+
+            if (container.children.length === 0) {
+                container.innerHTML = `
+                    <div class="bg-white rounded-xl p-12 text-center border border-slate-200">
+                        <i class="fa-solid fa-magnifying-glass text-3xl text-slate-300 mb-3"></i>
+                        <h4 class="font-semibold text-slate-700 text-sm">No matching requirements found</h4>
+                        <p class="text-xs text-slate-400 mt-1">Try clearing your search query or selecting another category tab.</p>
+                    </div>
+                `;
+            }
+        }
+
+        function updateProgress() {
+            let total = 0;
+            let completed = 0;
+
+            checklistData.forEach(sec => {
+                sec.items.forEach(item => {
+                    total++;
+                    if (appState.completedItems[item.id]) {
+                        completed++;
+                    }
+                });
+            });
+
+            const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
+            const bar = document.getElementById('progressBar');
+            const statusText = document.getElementById('progressStatusText');
+
+            if (bar) bar.style.width = `${percent}%`;
+            if (statusText) statusText.textContent = `${completed} of ${total} tasks completed (${percent}%)`;
+
+            renderCategoryStats();
+        }
+
+        function renderCategoryStats() {
+            const container = document.getElementById('categoryStats');
+            if (!container) return;
+
+            container.innerHTML = '';
+
+            checklistData.forEach(sec => {
+                const total = sec.items.length;
+                const comp = sec.items.filter(i => appState.completedItems[i.id]).length;
+                const p = Math.round((comp / total) * 100);
+
+                const div = document.createElement('div');
+                div.className = 'bg-slate-50 p-2.5 rounded-lg border border-slate-200/80 cursor-pointer hover:border-amber-400 transition';
+                div.onclick = () => setFilter(sec.id);
+                div.innerHTML = `
+                    <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400 truncate">${sec.title.split('.')[1] || sec.title}</div>
+                    <div class="text-sm font-bold ${p === 100 ? 'text-emerald-600' : 'text-slate-800'} mt-0.5">${comp}/${total}</div>
+                    <div class="w-full bg-slate-200 h-1 rounded-full mt-1.5 overflow-hidden">
+                        <div class="bg-amber-500 h-full" style="width: ${p}%"></div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function resetAllProgress() {
+            if (confirm("Are you sure you want to reset all completed tasks and custom notes?")) {
+                appState.completedItems = {};
+                appState.itemNotes = {};
+                saveState();
+                renderChecklist();
+                updateProgress();
+            }
+        }
+
+        function exportChecklistReport() {
+            let report = `====================================================\n`;
+            report += `AMAZON KDP PUBLISHING READINESS REPORT\n`;
+            report += `Project Title: ${appState.projectTitle || 'Untitled Book'}\n`;
+            report += `Generated On: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}\n`;
+            report += `====================================================\n\n`;
+
+            let totalTasks = 0;
+            let totalDone = 0;
+
+            checklistData.forEach(sec => {
+                const secDone = sec.items.filter(i => appState.completedItems[i.id]).length;
+                report += `SECTION: ${sec.title} [${secDone}/${sec.items.length}]\n`;
+                report += `-`.repeat(50) + `\n`;
+
+                sec.items.forEach(item => {
+                    totalTasks++;
+                    const isDone = !!appState.completedItems[item.id];
+                    if (isDone) totalDone++;
+
+                    const status = isDone ? '[X] PASSED' : '[ ] PENDING';
+                    report += `${status} - ${item.title}\n`;
+                    if (appState.itemNotes[item.id]) {
+                        report += `      Note: ${appState.itemNotes[item.id]}\n`;
+                    }
+                });
+                report += `\n`;
+            });
+
+            const overallPercent = Math.round((totalDone / totalTasks) * 100);
+            report += `====================================================\n`;
+            report += `SUMMARY STATUS: ${totalDone}/${totalTasks} Tasks Completed (${overallPercent}% Ready)\n`;
+            report += `====================================================\n`;
+
+            document.getElementById('exportTextarea').value = report;
+            document.getElementById('exportModal').classList.remove('hidden');
+        }
+
+        function closeExportModal() {
+            document.getElementById('exportModal').classList.add('hidden');
+        }
+
+        function copyExportText() {
+            const textarea = document.getElementById('exportTextarea');
+            textarea.select();
+            document.execCommand('copy');
+            alert('Report copied to clipboard!');
+        }
+
+        function escapeHtml(str) {
+            return str.replace(/&/g, "&amp;")
+                      .replace(/</g, "&lt;")
+                      .replace(/>/g, "&gt;")
+                      .replace(/"/g, "&quot;")
+                      .replace(/'/g, "&#039;");
+        }
+    </script>
+</body>
+</html>
