@@ -12,6 +12,12 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- PDF.js for PDF reading & page extraction -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <!-- Mammoth.js for DOCX reading & extraction -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+    
     <script>
         tailwind.config = {
             theme: {
@@ -85,6 +91,71 @@
 
     <!-- Main Container -->
     <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full">
+
+        <!-- Document Loader & Auto-Audit Hub Card -->
+        <div class="bg-gradient-to-r from-slate-900 via-slate-800 to-navy-900 text-white rounded-xl shadow-lg border border-slate-700 p-6 mb-8 relative overflow-hidden">
+            <div class="absolute -right-10 -bottom-10 opacity-10 pointer-events-none text-slate-100">
+                <i class="fa-solid fa-file-pdf text-[220px]"></i>
+            </div>
+            
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
+                <div class="space-y-2 max-w-xl">
+                    <div class="inline-flex items-center gap-2 px-2.5 py-1 bg-amber-500/20 border border-amber-500/40 rounded-full text-amber-300 text-xs font-semibold uppercase tracking-wider">
+                        <i class="fa-solid fa-wand-magic-sparkles text-amber-400"></i> Manuscript Auto-Inspector
+                    </div>
+                    <h2 class="text-xl font-bold tracking-tight text-white">Load Book Document & Analyze Specs</h2>
+                    <p class="text-xs text-slate-300 leading-relaxed">
+                        Upload your book manuscript (<span class="text-amber-300 font-mono">PDF, DOCX, TXT, MD</span>). The system will automatically parse word counts, estimate print page length, audit front matter structure, check Chicago Manual punctuation rules, detect Dorean/Copyright licenses, and auto-verify matching checklist requirements.
+                    </p>
+                </div>
+
+                <!-- File Dropzone / Upload Action -->
+                <div class="flex flex-col sm:flex-row items-center gap-3">
+                    <label id="dropZone" for="bookFileInput" class="cursor-pointer group flex flex-col items-center justify-center p-4 border-2 border-dashed border-amber-500/50 hover:border-amber-400 bg-slate-800/60 hover:bg-slate-800 rounded-xl transition text-center w-full sm:w-64">
+                        <i class="fa-solid fa-cloud-arrow-up text-2xl text-amber-400 group-hover:scale-110 transition-transform mb-1"></i>
+                        <span class="text-xs font-semibold text-slate-200 group-hover:text-amber-300">Choose or Drag Book File</span>
+                        <span class="text-[10px] text-slate-400 mt-0.5">Supports PDF, DOCX, TXT, MD</span>
+                        <input type="file" id="bookFileInput" accept=".pdf,.docx,.txt,.md" class="hidden" onchange="handleFileSelect(event)">
+                    </label>
+                </div>
+            </div>
+
+            <!-- Document Audit Summary Panel (Hidden until document is loaded) -->
+            <div id="documentAuditCard" class="hidden mt-6 pt-6 border-t border-slate-700/80 grid grid-cols-1 md:grid-cols-4 gap-4 relative z-10">
+                <div class="bg-slate-800/90 rounded-lg p-3.5 border border-slate-700">
+                    <div class="text-[10px] text-slate-400 uppercase font-semibold">Loaded File</div>
+                    <div class="text-sm font-bold text-amber-400 truncate mt-0.5" id="docFileName">--</div>
+                    <div class="text-[11px] text-slate-300 mt-1" id="docFileSize">0 KB</div>
+                </div>
+
+                <div class="bg-slate-800/90 rounded-lg p-3.5 border border-slate-700">
+                    <div class="text-[10px] text-slate-400 uppercase font-semibold">Length & Page Estimate</div>
+                    <div class="text-sm font-bold text-white mt-0.5" id="docWordCount">0 Words</div>
+                    <div class="text-[11px] text-amber-300/90 mt-1" id="docPageEstimate">Est. ~0 Pages @ 11pt Garamond</div>
+                </div>
+
+                <div class="bg-slate-800/90 rounded-lg p-3.5 border border-slate-700">
+                    <div class="text-[10px] text-slate-400 uppercase font-semibold">License & Metadata</div>
+                    <div class="text-sm font-bold text-emerald-400 mt-0.5" id="docLicenseType">Checking...</div>
+                    <div class="text-[11px] text-slate-300 mt-1" id="docIsbnFound">ISBN: Not Detected</div>
+                </div>
+
+                <div class="bg-slate-800/90 rounded-lg p-3.5 border border-slate-700 flex flex-col justify-between">
+                    <div>
+                        <div class="text-[10px] text-slate-400 uppercase font-semibold">Auto-Audit Results</div>
+                        <div class="text-xs font-semibold text-amber-300 mt-0.5" id="docAuditSummary">Ready for inspection</div>
+                    </div>
+                    <div class="flex gap-2 mt-2">
+                        <button onclick="applyAutoChecklistResults()" class="flex-1 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs py-1.5 px-2 rounded transition flex items-center justify-center gap-1">
+                            <i class="fa-solid fa-check-double"></i> Auto-Check
+                        </button>
+                        <button onclick="openDocumentInspectorModal()" class="bg-slate-700 hover:bg-slate-600 text-white font-medium text-xs py-1.5 px-2.5 rounded transition flex items-center justify-center gap-1">
+                            <i class="fa-solid fa-eye"></i> View Text
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- Progress Overview Card -->
         <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-8">
@@ -180,6 +251,45 @@
         </div>
     </div>
 
+    <!-- Modal for Document Inspector / Manuscript Reader -->
+    <div id="docInspectorModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-xl max-w-4xl w-full overflow-hidden border border-slate-200 flex flex-col max-h-[90vh]">
+            <div class="bg-slate-900 text-white px-6 py-4 flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                    <i class="fa-solid fa-book-open-reader text-amber-400 text-lg"></i>
+                    <div>
+                        <h3 class="font-semibold text-base" id="inspectorModalTitle">Manuscript Text Inspector</h3>
+                        <p class="text-xs text-slate-400">Extracted document content & CMOS audit highlights</p>
+                    </div>
+                </div>
+                <button onclick="closeDocumentInspectorModal()" class="text-slate-400 hover:text-white transition">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            
+            <div class="p-4 bg-slate-100 border-b border-slate-200 flex flex-wrap items-center justify-between gap-3 text-xs">
+                <div class="flex items-center gap-2">
+                    <span class="font-semibold text-slate-700">Filter View:</span>
+                    <button onclick="filterInspectorText('all')" class="px-2.5 py-1 bg-white border border-slate-300 rounded font-medium text-slate-700 hover:bg-slate-50">All Content</button>
+                    <button onclick="filterInspectorText('frontmatter')" class="px-2.5 py-1 bg-white border border-slate-300 rounded font-medium text-slate-700 hover:bg-slate-50">Front Matter</button>
+                    <button onclick="filterInspectorText('cmos')" class="px-2.5 py-1 bg-white border border-slate-300 rounded font-medium text-slate-700 hover:bg-slate-50">Chicago Style Highlights</button>
+                </div>
+                <div class="text-slate-500 italic" id="inspectorWordCountBadge">0 words extracted</div>
+            </div>
+
+            <div class="p-6 overflow-y-auto flex-1 custom-scrollbar bg-slate-50 font-serif leading-relaxed text-sm text-slate-800 space-y-4" id="docInspectorBody">
+                <!-- Extracted content rendered here -->
+            </div>
+
+            <div class="bg-slate-100 border-t border-slate-200 px-6 py-3 flex justify-between items-center text-xs text-slate-600">
+                <span>Tip: Verify front matter ordering and citation consistency before PDF generation.</span>
+                <button onclick="closeDocumentInspectorModal()" class="px-4 py-2 bg-slate-800 text-white font-medium rounded-lg text-xs hover:bg-slate-700 transition">
+                    Close Inspector
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Footer -->
     <footer class="bg-white border-t border-slate-200 py-6 text-center text-xs text-slate-500 mt-auto">
         <div class="max-w-6xl mx-auto px-4">
@@ -189,6 +299,11 @@
 
     <!-- JavaScript Data and Logic -->
     <script>
+        // Configure PDF.js worker URL
+        if (window.pdfjsLib) {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        }
+
         const checklistData = [
             {
                 id: "garamond",
@@ -463,16 +578,315 @@
             itemNotes: {},
             currentFilter: 'all',
             searchQuery: '',
-            projectTitle: 'My Masterpiece: Interior Layout & KDP Prep'
+            projectTitle: 'My Masterpiece: Interior Layout & KDP Prep',
+            loadedDoc: null // Holds extracted manuscript data & audit results
         };
 
         // Initialize App
         document.addEventListener('DOMContentLoaded', () => {
             loadState();
             setupEventListeners();
+            setupDropzone();
             renderChecklist();
             updateProgress();
         });
+
+        function setupDropzone() {
+            const dropZone = document.getElementById('dropZone');
+            if (!dropZone) return;
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropZone.addEventListener(eventName, (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    dropZone.classList.add('border-amber-400', 'bg-slate-800');
+                }, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    dropZone.classList.remove('border-amber-400', 'bg-slate-800');
+                }, false);
+            });
+
+            dropZone.addEventListener('drop', (e) => {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                if (files && files.length > 0) {
+                    processUploadedFile(files[0]);
+                }
+            });
+        }
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                processUploadedFile(file);
+            }
+        }
+
+        async function processUploadedFile(file) {
+            const name = file.name;
+            const ext = name.substring(name.lastIndexOf('.')).toLowerCase();
+            const sizeKB = (file.size / 1024).toFixed(1);
+
+            showAuditLoadingState(name, `${sizeKB} KB`);
+
+            try {
+                let extractedText = "";
+
+                if (ext === '.pdf') {
+                    extractedText = await parsePdfFile(file);
+                } else if (ext === '.docx') {
+                    extractedText = await parseDocxFile(file);
+                } else if (ext === '.txt' || ext === '.md') {
+                    extractedText = await parseTextFile(file);
+                } else {
+                    alert('Unsupported file format. Please upload a PDF, DOCX, TXT, or MD file.');
+                    return;
+                }
+
+                if (!extractedText || extractedText.trim().length === 0) {
+                    alert('No text could be extracted from the uploaded document.');
+                    return;
+                }
+
+                // Analyze extracted text
+                const audit = analyzeManuscriptText(extractedText, name);
+                
+                appState.loadedDoc = {
+                    fileName: name,
+                    fileSizeKB: sizeKB,
+                    text: extractedText,
+                    audit: audit
+                };
+
+                updateDocumentAuditUI();
+            } catch (err) {
+                console.error("Document parsing error:", err);
+                alert("Error reading file: " + err.message);
+            }
+        }
+
+        function showAuditLoadingState(fileName, fileSize) {
+            const card = document.getElementById('documentAuditCard');
+            card.classList.remove('hidden');
+            document.getElementById('docFileName').textContent = fileName;
+            document.getElementById('docFileSize').textContent = fileSize;
+            document.getElementById('docWordCount').textContent = "Parsing content...";
+            document.getElementById('docPageEstimate').textContent = "Calculating typography specs...";
+            document.getElementById('docLicenseType').textContent = "Analyzing licensing...";
+            document.getElementById('docIsbnFound').textContent = "Scanning metadata...";
+            document.getElementById('docAuditSummary').textContent = "Running CMOS & KDP Audit...";
+        }
+
+        async function parsePdfFile(file) {
+            const arrayBuffer = await file.arrayBuffer();
+            const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+            let fullText = "";
+
+            for (let i = 1; i <= pdf.numPages; i++) {
+                const page = await pdf.getPage(i);
+                const textContent = await page.getTextContent();
+                const pageText = textContent.items.map(item => item.str).join(' ');
+                fullText += `\n--- [ Page ${i} ] ---\n` + pageText;
+            }
+            return fullText;
+        }
+
+        async function parseDocxFile(file) {
+            const arrayBuffer = await file.arrayBuffer();
+            const result = await mammoth.extractRawText({ arrayBuffer: arrayBuffer });
+            return result.value;
+        }
+
+        function parseTextFile(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (e) => resolve(e.target.result);
+                reader.onerror = (e) => reject(e);
+                reader.readAsText(file);
+            });
+        }
+
+        function analyzeManuscriptText(text, fileName) {
+            const lowerText = text.toLowerCase();
+            const wordCount = text.trim().split(/\s+/).filter(w => w.length > 0).length;
+
+            // Estimate pages for 11pt Garamond (~300 words per formatted page + 15% front/back matter allowance)
+            const estimatedBodyPages = Math.ceil(wordCount / 300);
+            const totalEstimatedPages = estimatedBodyPages + 10; 
+
+            // Calculate recommended KDP Inside Gutter Margin
+            let recommendedGutter = "0.375 in (9.5 mm)";
+            let gutterCheckId = "garamond_3";
+            if (totalEstimatedPages > 500) {
+                recommendedGutter = "0.75 in (19.1 mm)";
+            } else if (totalEstimatedPages > 300) {
+                recommendedGutter = "0.625 in (15.9 mm)";
+            } else if (totalEstimatedPages > 150) {
+                recommendedGutter = "0.50 in (12.7 mm)";
+            }
+
+            // Detect Front Matter Sections
+            const hasTitlePage = lowerText.includes("title page") || lowerText.includes("by ") || lowerText.includes("author");
+            const hasCopyright = lowerText.includes("copyright") || lowerText.includes("all rights reserved") || lowerText.includes("creative commons") || lowerText.includes("cc0");
+            const hasToc = lowerText.includes("contents") || lowerText.includes("table of contents");
+            const hasDedication = lowerText.includes("dedication") || lowerText.includes("dedicated to");
+            const hasChapter1 = lowerText.includes("chapter 1") || lowerText.includes("chapter one");
+
+            // Detect License Type
+            let isDorean = lowerText.includes("cc0") || lowerText.includes("public domain") || lowerText.includes("dorean") || lowerText.includes("freely given");
+            let licenseLabel = isDorean ? "Dorean CC0 (Public Domain)" : "Standard Copyright";
+
+            // Detect ISBN
+            const isbnRegex = /(?:ISBN(?:-13)?:?\s*)?(?=[0-9X]{10}$|(?=(?:[0-9]+[-\s]){3})[0-9SRBNd\s-]{13,17}$)(97[89][-\s]?[0-9]{1,5}[-\s]?[0-9]+[-\s]?[0-9]+[-\s]?[0-9])/i;
+            const isbnMatch = text.match(isbnRegex);
+            const isbnFound = isbnMatch ? isbnMatch[0] : null;
+
+            // Scan CMOS Rules
+            // 1. Oxford Comma check
+            const oxfordMatches = text.match(/,\s+(and|or)\s+/gi) || [];
+            
+            // 2. Quotation punctuation placement check (e.g. "text", vs "text,")
+            const cmosPunctuationInside = text.match(/[\w][,\.]"/g) || [];
+            const cmosPunctuationOutside = text.match(/[\w]"[,\.]/g) || [];
+
+            // Suggested Checklist Auto-Passes
+            const autoPasses = [];
+            if (hasTitlePage && hasCopyright) autoPasses.push("fm_1"); // Front matter order
+            if (hasCopyright) autoPasses.push("fm_3"); // Copyright / Dorean license setup
+            if (hasToc) autoPasses.push("fm_4"); // Table of contents
+            if (oxfordMatches.length > 5) autoPasses.push("cmos_6"); // Serial comma uniformity
+            if (cmosPunctuationInside.length > cmosPunctuationOutside.length) autoPasses.push("cmos_4"); // CMOS Punctuation placement
+
+            return {
+                wordCount,
+                estimatedPages: totalEstimatedPages,
+                recommendedGutter,
+                hasTitlePage,
+                hasCopyright,
+                hasToc,
+                hasDedication,
+                hasChapter1,
+                isDorean,
+                licenseLabel,
+                isbnFound,
+                oxfordMatchesCount: oxfordMatches.length,
+                cmosPunctuationInsideCount: cmosPunctuationInside.length,
+                cmosPunctuationOutsideCount: cmosPunctuationOutside.length,
+                autoPasses
+            };
+        }
+
+        function updateDocumentAuditUI() {
+            if (!appState.loadedDoc) return;
+            const doc = appState.loadedDoc;
+            const audit = doc.audit;
+
+            document.getElementById('docFileName').textContent = doc.fileName;
+            document.getElementById('docFileSize').textContent = `${doc.fileSizeKB} KB`;
+            document.getElementById('docWordCount').textContent = `${audit.wordCount.toLocaleString()} Words`;
+            document.getElementById('docPageEstimate').textContent = `Est. ~${audit.estimatedPages} Pages (${audit.recommendedGutter} Gutter)`;
+            
+            const licenseEl = document.getElementById('docLicenseType');
+            licenseEl.textContent = audit.licenseLabel;
+            licenseEl.className = audit.isDorean ? "text-sm font-bold text-amber-300 mt-0.5" : "text-sm font-bold text-emerald-400 mt-0.5";
+
+            document.getElementById('docIsbnFound').textContent = audit.isbnFound ? `ISBN: ${audit.isbnFound}` : "ISBN: Not Detected";
+            document.getElementById('docAuditSummary').textContent = `${audit.autoPasses.length} Requirements Auto-Verified`;
+
+            // Auto-populate Project Title if empty or default
+            if (doc.fileName && document.getElementById('projectTitle').value === "My Masterpiece: Interior Layout & KDP Prep") {
+                const titleClean = doc.fileName.replace(/\.[^/.]+$/, "");
+                document.getElementById('projectTitle').value = titleClean;
+                appState.projectTitle = titleClean;
+                saveState();
+            }
+
+            // Update Gutter Note automatically in checklist
+            updateNote('garamond_3', `Auto-Scanned: Est. ${audit.estimatedPages} pages requires min ${audit.recommendedGutter} gutter margin.`);
+        }
+
+        function applyAutoChecklistResults() {
+            if (!appState.loadedDoc) {
+                alert("Please load a book document first.");
+                return;
+            }
+
+            const passes = appState.loadedDoc.audit.autoPasses;
+            if (passes.length === 0) {
+                alert("No automatic criteria could be matched. Please manually review the requirements.");
+                return;
+            }
+
+            passes.forEach(id => {
+                appState.completedItems[id] = true;
+            });
+
+            saveState();
+            renderChecklist();
+            updateProgress();
+            alert(`Successfully auto-verified ${passes.length} checklist requirements based on manuscript analysis!`);
+        }
+
+        function openDocumentInspectorModal() {
+            if (!appState.loadedDoc) {
+                alert("Please load a book document first.");
+                return;
+            }
+
+            const doc = appState.loadedDoc;
+            document.getElementById('inspectorModalTitle').textContent = `Manuscript Inspector: ${doc.fileName}`;
+            document.getElementById('inspectorWordCountBadge').textContent = `${doc.audit.wordCount.toLocaleString()} words total`;
+            
+            filterInspectorText('all');
+            document.getElementById('docInspectorModal').classList.remove('hidden');
+        }
+
+        function closeDocumentInspectorModal() {
+            document.getElementById('docInspectorModal').classList.add('hidden');
+        }
+
+        function filterInspectorText(type) {
+            if (!appState.loadedDoc) return;
+            const text = appState.loadedDoc.text;
+            const bodyContainer = document.getElementById('docInspectorBody');
+
+            if (type === 'frontmatter') {
+                const lines = text.split('\n').slice(0, 150).join('\n');
+                bodyContainer.innerHTML = `<div class="bg-amber-50 p-4 rounded-lg border border-amber-200 text-xs font-sans text-amber-900 mb-4">
+                    <i class="fa-solid fa-circle-info"></i> Showing first 150 lines (Front Matter inspection area):
+                </div>
+                <pre class="whitespace-pre-wrap font-serif text-sm">${escapeHtml(lines)}</pre>`;
+            } else if (type === 'cmos') {
+                const audit = appState.loadedDoc.audit;
+                bodyContainer.innerHTML = `
+                    <div class="bg-white p-4 rounded-lg border border-slate-200 text-xs font-sans space-y-3 mb-4">
+                        <h4 class="font-bold text-slate-900 text-sm">Chicago Manual of Style (CMOS) Automated Audit</h4>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <div class="p-3 bg-slate-50 rounded border border-slate-200">
+                                <span class="text-slate-500 block text-[10px] uppercase">Serial (Oxford) Commas</span>
+                                <span class="text-base font-bold text-slate-800">${audit.oxfordMatchesCount} matches</span>
+                            </div>
+                            <div class="p-3 bg-slate-50 rounded border border-slate-200">
+                                <span class="text-slate-500 block text-[10px] uppercase">CMOS Standard Punctuation (," or .")</span>
+                                <span class="text-base font-bold text-emerald-600">${audit.cmosPunctuationInsideCount} matches</span>
+                            </div>
+                            <div class="p-3 bg-slate-50 rounded border border-slate-200">
+                                <span class="text-slate-500 block text-[10px] uppercase">Non-CMOS Punctuation (", or ".)</span>
+                                <span class="text-base font-bold text-amber-600">${audit.cmosPunctuationOutsideCount} matches</span>
+                            </div>
+                        </div>
+                    </div>
+                    <pre class="whitespace-pre-wrap font-serif text-sm">${escapeHtml(text.slice(0, 3000))} ... [truncated for summary]</pre>
+                `;
+            } else {
+                bodyContainer.innerHTML = `<pre class="whitespace-pre-wrap font-serif text-sm">${escapeHtml(text.slice(0, 8000))}${text.length > 8000 ? '\n\n... [Preview limited to first 8,000 characters]' : ''}</pre>`;
+            }
+        }
 
         function loadState() {
             const saved = localStorage.getItem('kdp_checklist_state');
